@@ -1,0 +1,128 @@
+﻿@model Social_Network.Core.Application.ViewModels.Home.HomeVM
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="container mt-4">
+   
+    <div class="card mb-4 shadow">
+        <div class="card-body">
+            <form asp-controller="Home" asp-action="NewPost" method="post" enctype="multipart/form-data">
+                <div class="form-group mb-3">
+                    <textarea asp-for="Content" class="form-control" rows="3" placeholder="¿Qué estás pensando?"></textarea>
+                    <span asp-validation-for="Content" class="text-danger"></span>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <select asp-for="PostTypeId" class="form-select">
+                            <option value="">Seleccione un tipo</option>
+                            @foreach (var type in Model.Types)
+                            {
+                                <option value="@type.Id">@type.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="PostTypeId" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Image" class="form-label">Imagen</label>
+                    <input asp-for="Image" class="form-control" accept="image/*">
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="VideoUrl" class="form-label">URL de YouTube</label>
+                    <input asp-for="VideoUrl" class="form-control" placeholder="https://www.youtube.com/watch?v=...">
+                    <span asp-validation-for="VideoUrl" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Publicar</button>
+            </form>
+        </div>
+    </div>
+
+    @foreach (var post in Model.ReadVMs.OrderByDescending(p => p.LastUpdated))
+    {
+        <div class="card mb-4 shadow">
+            <div class="card-header bg-white">
+                <div class="d-flex align-items-center">
+                    <img src="@post.UserProfilePhotoPath" class="rounded-circle me-3" width="40" height="40" alt="Foto de perfil">
+                    <div>
+                        <h6 class="mb-0">@post.AuthorUserName</h6>
+                        <small class="text-muted">@post.LastUpdated?.ToString("g")</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <p class="card-text">@post.Content</p>
+
+                @if (!string.IsNullOrEmpty(post.ImageUrl))
+                {
+                    <div class="text-center my-3">
+                        <img src="@post.ImageUrl" class="img-fluid rounded" alt="Imagen de publicación">
+                    </div>
+                }
+                else if (!string.IsNullOrEmpty(post.VideoUrl))
+                {
+                    <div class="ratio ratio-16x9 my-3">
+                        <iframe src="https://www.youtube.com/embed/@GetYouTubeId(post.VideoUrl)"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen></iframe>
+                    </div>
+                }
+            </div>
+
+            <div class="card-footer bg-white">
+                <div class="d-flex justify-content-between">
+                    <form asp-controller="Home" asp-action="GiveLikeToPost" method="post">
+                        <input type="hidden" name="postId" value="@post.Id" />
+                        <button type="submit" class="btn btn-sm @(post.IsLiked ? "btn-success" : "btn-outline-success")">
+                            <i class="fas fa-thumbs-up"></i> @post.Likes
+                        </button>
+                    </form>
+
+                    <form asp-controller="Home" asp-action="GiveDislikeToPost" method="post">
+                        <input type="hidden" name="postId" value="@post.Id" />
+                        <button type="submit" class="btn btn-sm @(post.IsDisliked ? "btn-danger" : "btn-outline-danger")">
+                            <i class="fas fa-thumbs-down"></i> @post.Dislikes
+                        </button>
+                    </form>
+
+                    <a asp-controller="Comment" asp-action="ShowCommentsOf" asp-route-Id="@post.Id"
+                       class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-comment"></i> Comentar
+                    </a>
+
+                    @if (post.UserId == Model.UserId)
+                    {
+                         
+                        <a asp-controller="Home" asp-action="EditPost" asp-route-postId="@post.Id"
+                           class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+
+
+                        <a asp-controller="Home" asp-action="DeletePost" asp-route-postId="@post.Id"
+                           class="btn btn-sm btn-outline-danger">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </a>
+
+                  
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@functions {
+    public static string GetYouTubeId(string url)
+    {
+        var uri = new Uri(url);
+        var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+        return query.AllKeys.Contains("v") ? query["v"] : uri.Segments.Last();
+    }
+}

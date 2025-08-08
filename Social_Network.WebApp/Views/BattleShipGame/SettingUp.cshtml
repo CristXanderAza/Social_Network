@@ -1,0 +1,56 @@
+﻿@using Social_Network.Core.Application.ViewModels.Battleship.BattleshipGames
+@model SettUpShipVM;
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+
+<div class="card">
+    <div class="card-header bg-primary">
+        <h1 class="text-center text-light">Selecciona a el barco a colocar</h1>
+    </div>
+    <div class="card-body">
+        @if (Model.PosibleSized.Any())
+        {
+
+
+            <form asp-action="SettUp" method="post">
+                <input asp-for="GameId" class="form-control" value="@Model.GameId" hidden />
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Posiciones</th>
+                                <th>Selecciona</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var opcion in Model.PosibleSized)
+                            {
+                                <tr>
+
+                                    <td>
+                                        <h5>@opcion</h5>
+                                    </td>
+                                    <td>
+                                        <input type="radio" asp-for="SelectedSize" value="@opcion" />
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">Enviar Selección</button>
+                </div>
+            </form>
+        }
+        else
+        {
+            <div class="alert alert-info text-center mb-0">Ya has posicionado todos tus barcos, espera a que tu oponente termine</div>
+        }
+    </div>
+</div>

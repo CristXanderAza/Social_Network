@@ -1,0 +1,48 @@
+﻿@using Social_Network.Core.Application.DTOs.Battleship.BattleshipGames
+@model NewGameVM;
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<div class="card">
+    <div class="card-header bg-primary">
+        <h1 class="text-center text-light">Selecciona a tu oponente</h1>
+    </div>
+    <div class="card-body">
+        <form asp-action="NewGame" method="post">
+            <div class="table-responsive">
+                <table class="table table-bordered text-center">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Foto</th>
+                            <th>Usuario</th>
+                            <th>Selecciona</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var opcion in Model.userHeaderVMs)
+                        {
+                            <tr>
+                                <td>
+                                    <img src="~/@opcion.ProfilePhotoPath" alt="Foto de perfil" class="img-fluid" style="max-height: 60px;" />
+                                </td>
+                                <td>
+                                    <h5>@opcion.UserName</h5>
+                                </td>
+                                <td>
+                                    <input type="radio" asp-for="selectedOponent" value="@opcion.UserId" />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">Enviar Selección</button>
+            </div>
+        </form>
+    </div>
+</div>

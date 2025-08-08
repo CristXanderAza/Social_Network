@@ -1,0 +1,53 @@
+﻿@using Social_Network.Core.Application.ViewModels.Common
+@model GenericAlertVM
+@{
+    ViewData["Title"] = "Confirmación";
+    // Determina los colores basados en el alertType
+    var cardHeaderClass = $"bg-{Model.alertType} text-white";
+    var confirmButtonClass = $"btn btn-outline-{Model.alertType}";
+    
+}
+
+<div class="row justify-content-center">
+    <div class="col-12 col-md-6 col-lg-4">
+        <div class="card shadow">
+            <div class="card-header @cardHeaderClass">
+                <h5 class="card-title text-center mb-0">
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <p class="lead">@Model.Message</p>
+                </div>
+
+                <form asp-controller="@Model.Controller" asp-action="@Model.ActionDestination" method="post">
+                    <input type="hidden" name="ResourceId" value="@Model.ResourceId" />
+                    @if (Model.AnotherResoruceId.HasValue)
+                    {
+                        <input type="hidden" name="AnotherResoruceId" value="@Model.AnotherResoruceId.Value" />
+                    }
+
+                    <div class="d-flex justify-content-center gap-2">
+                        <button type="submit" class="@confirmButtonClass">
+                            <i class="fas fa-check me-2"></i>Confirmar
+                        </button>
+                        <a asp-controller="@Model.Controller" asp-action="@Model.ActionSource"
+                           class="btn btn-outline-secondary">
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        margin-top: 2rem;
+    }
+
+    .lead {
+        font-size: 1.25rem;
+    }
+</style>

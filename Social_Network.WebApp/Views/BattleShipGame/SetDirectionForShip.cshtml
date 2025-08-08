@@ -1,0 +1,49 @@
+﻿@using Social_Network.Core.Application.ViewModels.Battleship.BattleshipGames
+@model SetDirectionVM;
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+
+<div class="card">
+    <div class="card-header bg-primary">
+        <h1 class="text-center text-light">Selecciona a la direccion para el barco</h1>
+    </div>
+    <div class="card-body">
+        <form asp-action="SetDirectionForShip" method="post">
+            <input asp-for="GameId" class="form-control" value="@Model.GameId" hidden />
+            <input asp-for="Size" class="form-control" value="@Model.Size" hidden />
+            <input asp-for="X" class="form-control" value="@Model.X" hidden />
+            <input asp-for="Y" class="form-control" value="@Model.Y" hidden />
+            <div class="table-responsive">
+                <table class="table table-bordered text-center">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Selecciona</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var opcion in Model.PosibleDirections)
+                        {
+                            <tr>
+                                <td>
+                                    <h5>@opcion.Name</h5>
+                                </td>
+                                <td>
+                                    <input type="radio" asp-for="Direction" value="@opcion.Id" />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">Enviar Selección</button>
+            </div>
+        </form>
+    </div>
+</div>

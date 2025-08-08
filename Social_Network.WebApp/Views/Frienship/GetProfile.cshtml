@@ -1,0 +1,100 @@
+﻿@model Social_Network.Core.Application.ViewModels.Friendships.ProfileReadVM
+@{
+    ViewData["Title"] = "Perfil de " + Model.UserName;
+}
+
+<div class="container mt-4">
+    
+    <div class="card mb-4 shadow">
+        <div class="card-body text-center">
+            <div class="d-flex flex-column align-items-center">
+                <img src="~/@Model.ProfileImgURL" class="rounded-circle mb-3" width="120" height="120" alt="Foto de perfil">
+                <h3 class="mb-0">@Model.UserName</h3>
+                <div class="mt-2">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.PostDTOs != null && Model.PostDTOs.Any())
+    {
+        foreach (var post in Model.PostDTOs.OrderByDescending(p => p.LastUpdated))
+        {
+            <div class="card mb-4 shadow">
+                <div class="card-header bg-white">
+                    <div class="d-flex align-items-center">
+                        <img src="@post.UserProfilePhotoPath" class="rounded-circle me-3" width="40" height="40" alt="Foto de perfil">
+                        <div>
+                            <h6 class="mb-0">@post.AuthorUserName</h6>
+                            <small class="text-muted">@post.LastUpdated?.ToString("g")</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <p class="card-text">@post.Content</p>
+
+                    @if (!string.IsNullOrEmpty(post.ImageUrl))
+                    {
+                        <div class="text-center my-3">
+                            <img src="~/@post.ImageUrl" class="img-fluid rounded" alt="Imagen de publicación">
+                        </div>
+                    }
+                    else if (!string.IsNullOrEmpty(post.VideoUrl))
+                    {
+                        <div class="ratio ratio-16x9 my-3">
+                            <iframe src="https://www.youtube.com/embed/@GetYouTubeId(post.VideoUrl)"
+                                    frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen></iframe>
+                        </div>
+                    }
+                </div>
+
+                <div class="card-footer bg-white">
+                    <div class="d-flex justify-content-between">
+                       
+                        <form asp-controller="Home" asp-action="GiveLikeToPost" method="post">
+                            <input type="hidden" name="postId" value="@post.Id" />
+                            <button type="submit" class="btn btn-sm @(post.IsLiked ? "btn-success" : "btn-outline-success")">
+                                <i class="fas fa-thumbs-up"></i> @post.Likes
+                            </button>
+                        </form>
+
+                        <form asp-controller="Home" asp-action="GiveDislikeToPost" method="post">
+                            <input type="hidden" name="postId" value="@post.Id" />
+                            <button type="submit" class="btn btn-sm @(post.IsDisliked ? "btn-danger" : "btn-outline-danger")">
+                                <i class="fas fa-thumbs-down"></i> @post.Dislikes
+                            </button>
+                        </form>
+
+                        <a asp-controller="Comment" asp-action="ShowCommentsOf" asp-route-Id="@post.Id"
+                           class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-comment"></i> Comentar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="card shadow">
+            <div class="card-body text-center">
+                <i class="fas fa-newspaper fa-3x mb-3 text-muted"></i>
+                <h5 class="card-title">No hay publicaciones</h5>
+                <p class="card-text">Este usuario aún no ha compartido ninguna publicación.</p>
+            </div>
+        </div>
+    }
+</div>
+
+@functions {
+    public static string GetYouTubeId(string url)
+    {
+        var uri = new Uri(url);
+        var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+        return query.AllKeys.Contains("v") ? query["v"] : uri.Segments.Last();
+    }
+}

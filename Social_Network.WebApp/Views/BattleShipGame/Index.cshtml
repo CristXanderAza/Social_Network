@@ -1,0 +1,110 @@
+﻿@using Social_Network.Core.Application.ViewModels.Battleship.BattleshipGames
+@model MainBattleShipVM;
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<div class="container mt-4">
+
+
+    <div class="card mb-4 shadow">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Resumen</h5>
+            </div>
+        </div>
+        <div class="card-body">
+            <h6>Partidas Jugadas: @(Model.BattleShipResumeVM.Won + Model.BattleShipResumeVM.Lose)</h6>
+            <h6>Partidas Ganadas: @(Model.BattleShipResumeVM.Won)</h6>
+            <h6>Partidas Perdidas: @( Model.BattleShipResumeVM.Lose)</h6>
+        </div>
+    </div>
+
+    <div class="card mb-4 shadow">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Partidas activas</h5>
+                <div>
+                    <a asp-controller="BattleShipGame" asp-action="NewGame" class="btn btn-sm btn-light">
+                        <i class="fas fa-plus"></i> Nueva Partida
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            @if (!Model.ActiveGameVMs.Any())
+            {
+                <div class="alert alert-info text-center mb-0">No tienes ninguna partida activa</div>
+            }
+            else
+            {
+                <div class="row mt-2">
+                    @foreach (var item in Model.ActiveGameVMs)
+                    {
+
+                        <div class="col-12 col-md-3">
+                            <div class="card mb-2">
+                                <div class="card-body">
+                                    <h5>Vs @item.OponentName</h5>
+                                    <h5>@((int)item.DurationInHours) horas jugadas</h5>
+                                    <p class="card-text">Estatus: @item.Status</p>
+                                    <div class="mt-2">
+                                        <a class="btn btn-outline-primary float-end" asp-controller="BattleShipGame" asp-action="LoadGame" asp-route-gameId="@item.Id">Jugar</a>
+                                        <a class="btn btn-outline-danger float-end me-2" asp-controller="BattleShipGame" asp-action="GiveUp" asp-route-gameId="@item.Id">Rendirse</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+
+
+    <div class="card mb-4 shadow">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Historial</h5>
+                <span class="badge bg-light text-dark">@Model.HistoryGameVMs.Count()</span>
+            </div>
+        </div>
+        <div class="card-body">
+            @if (!Model.HistoryGameVMs.Any())
+            {
+                <div class="alert alert-info text-center mb-0">No hay registro de partidas jugadas</div>
+            }
+            else
+            {
+                <div class="row mt-2">
+                    @foreach (var item in Model.HistoryGameVMs)
+                    {
+
+                        <div class="col-12 col-md-3">
+                            <div class="card mb-2">
+                                <div class="card-body">
+                                    <h5>Ganador: @item.Winner</h5>
+                                    <h5>Inicio: @item.StartedAt</h5>
+                                    <h5>Final: @item.FinishedAt</h5>
+                                    <div class="mt-2">
+                                        <a class="btn btn-outline-primary float-end" asp-controller="BattleShipGame" asp-action="SeeResultsOfUser" asp-route-gameId="@item.GameId">Ver resultados</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+</div>

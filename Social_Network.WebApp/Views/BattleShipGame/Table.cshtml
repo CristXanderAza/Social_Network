@@ -1,0 +1,127 @@
+﻿@using Social_Network.Core.Application.DTOs.Battleship.BattleshipGames
+@using Social_Network.Core.Application.ViewModels.Battleship.BattleshipGames
+@model CurrentGameInfoVM;
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    var destinationMethod = "";
+    if (Model.CanAction)
+    {
+        switch (Model.Fase)
+        {
+            case 1:
+                destinationMethod = "SetDirectionForShip"; break;
+            case 2:
+                destinationMethod = "AttackOnPosition"; break;
+            default:
+                destinationMethod = "Index"; break;
+        }
+    }
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="text-center mb-0">
+                        <i class="fas fa-ship me-2"></i> Tablero
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info mb-4">
+                        <h5 class="alert-heading">Instrucciones:</h5>
+                        <p class="mb-0">@Model.Message</p>
+                    </div>
+                    <div class="text-center">
+                        <table class="table table-bordered battleship-board">
+                            @for (int y = 1; y <= 12; y++)
+                            {
+                                <tr>
+                                    @for (int x = 1; x <= 12; x++)
+                                    {
+                                        var btClass = "btn btn-outline-primary btn-cell d-block";
+                                        var iconClass = "fas fa-water";
+                                        var lockedCell = Model.LockedCells?.FirstOrDefault(lc => lc.X == x && lc.Y == y);
+
+                                        if (lockedCell != null)
+                                        {
+                                            switch (lockedCell.Type)
+                                            {
+                                                case LockedType.Hited:
+                                                    btClass = "btn btn-outline-success btn-cell d-block";
+                                                    iconClass = "fas fa-fire";
+                                                    break;
+                                                case LockedType.Missed:
+                                                    btClass = "btn btn-outline-danger btn-cell d-block";
+                                                    iconClass = "fas fa-times";
+                                                    break;
+                                                default:
+                                                    btClass = "btn btn-outline-secondary btn-cell d-block";
+                                                    iconClass = "fas fa-ship";
+                                                    break;
+                                            }
+                                        }
+
+                                        <td class="text-center p-0">
+                                            @if (lockedCell != null)
+                                            {
+                                                <button class="@btClass" disabled>
+                                                    <i class="@iconClass"></i>
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                if (Model.CanAction)
+                                                {
+                                                    <a asp-controller="BattleShipGame"
+                                                    asp-action="@destinationMethod"
+                                                    asp-route-x="@x"
+                                                    asp-route-y="@y"
+                                                    asp-route-size="@Model.Size"
+                                                    asp-route-gameId="@Model.GameId"
+                                                    class="@btClass">
+                                                        <i class="@iconClass" style="opacity: 0.3;"></i>
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <button class="@btClass" disabled>
+                                                        <i class="@iconClass"></i>
+                                                    </button>
+                                                }
+
+                                            }
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        </table>
+                    </div>
+                </div>
+                @if(Model.Fase == 3)
+                {
+                    <div class="card-footer bg-white">
+                        <div class="d-flex justify-content-between">
+                            <a class="btn btn-outline-secondary float-end" asp-controller="BattleShipGame" asp-action="Index">Volver </a>
+                            <a class="btn btn-outline-secondary float-end" asp-controller="BattleShipGame" asp-action="SeeResultsOfOponent" asp-route-gameId="@Model.GameId">Ver tablero enemigo </a>
+                            <a class="btn btn-outline-secondary float-end" asp-controller="BattleShipGame" asp-action="SeeOriginalPosition" asp-route-gameId="@Model.GameId">Ver posiciones originales </a>
+                        </div>
+                    </div>
+                }
+                else if(Model.Fase == 2 && !Model.CanAction)
+                {
+                    <div class="card-footer bg-white">
+                        <div class="d-flex justify-content-between">
+                            <a class="btn btn-outline-secondary float-end" asp-controller="BattleShipGame" asp-action="Index">Volver </a>
+                            <a class="btn btn-outline-secondary float-end" asp-controller="BattleShipGame" asp-action="LoadGame" asp-route-gameId="@Model.GameId">Refrescar </a>
+                            <a class="btn btn-outline-secondary float-end" asp-controller="BattleShipGame" asp-action="SeeOriginalPosition" asp-route-gameId="@Model.GameId">Volver </a>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>

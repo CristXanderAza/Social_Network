@@ -1,0 +1,136 @@
+﻿@model Social_Network.Core.Application.ViewModels.Comments.CommentListVM
+@{
+    ViewData["Title"] = "Comentarios";
+}
+
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0"><i class="fas fa-comments me-2"></i>Sección de Comentarios</h4>
+        </div>
+
+        <div class="card-body border-bottom">
+            <div class="card mb-3">
+                <div class="card-header bg-light">
+                    <div class="d-flex align-items-center">
+                        <img src="~/@Model.UserProfilePhotoUrl" class="rounded-circle me-3" width="40" height="40" alt="Foto de perfil">
+                        <div>
+                            <h6 class="mb-0">@Model.UserName</h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">@Model.PostText</p>
+
+                    @if (!string.IsNullOrEmpty(Model.ImgUrl))
+                    {
+                        <div class="text-center my-3">
+                            <img src="~/@Model.ImgUrl" class="img-fluid rounded" alt="Imagen de publicación">
+                        </div>
+                    }
+                    else if (!string.IsNullOrEmpty(Model.VideoUrl))
+                    {
+                        <div class="ratio ratio-16x9 my-3">
+                            <iframe src="https://www.youtube.com/embed/@GetYouTubeId(Model.VideoUrl)"
+                                    frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen></iframe>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div class="mb-4">
+                <a asp-controller="Comment"
+                   asp-action="NewCommentFor"
+                   asp-route-id="@Model.PostId"
+                   class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Nuevo Comentario
+                </a>
+            </div>
+
+            @if (Model.ReadVMs.Any())
+            {
+                <div class="list-group">
+                    @foreach (var comment in Model.ReadVMs)
+                    {
+                        <div class="list-group-item mb-3 border rounded @(comment.ParentCommentId != null ? "ms-4" : "")"
+                             style="@(comment.ParentCommentId != null ? "border-left: 3px solid #0d6efd !important;" : "")">
+
+                            @if (comment.ParentCommentId != null)
+                            {
+                                var parentComment = Model.ReadVMs.FirstOrDefault(c => c.Id == comment.ParentCommentId);
+                                if (parentComment != null)
+                                {
+                                    <div class="card mb-2 bg-light">
+                                        <div class="card-body p-2">
+                                            <small class="text-muted">Respondiendo a @parentComment.UserName</small>
+                                            <p class="mb-0 small">@parentComment.Content</p>
+                                        </div>
+                                    </div>
+                                }
+                            }
+
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div class="d-flex align-items-center">
+                                    <img src="@comment.UserPhotoPath" class="rounded-circle me-2" width="32" height="32" alt="Foto de perfil">
+                                    <h6 class="mb-0">@comment.UserName</h6>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <p class="mb-0">@comment.Content</p>
+                            </div>
+
+                            <div class="btn-group btn-group-sm">
+                                <a asp-controller="Comment"
+                                   asp-action="NewRepplyFor"
+                                   asp-route-commentId="@comment.Id"
+                                   asp-route-postId="@Model.PostId"
+                                   class="btn btn-outline-primary">
+                                    <i class="fas fa-reply me-1"></i>Responder
+                                </a>
+
+                                @if (comment.UserId == Model.ActualUserId)
+                                {
+                                    <a asp-controller="Comment"
+                                       asp-action="EditComment"
+                                       asp-route-commentId="@comment.Id"
+                                       asp-route-postId="@Model.PostId"
+                                       class="btn btn-outline-secondary">
+                                        <i class="fas fa-edit me-1"></i>Editar
+                                    </a>
+
+                                    <a asp-controller="Comment"
+                                       asp-action="DeleteComment"
+                                       asp-route-commentId="@comment.Id"
+                                       asp-route-postId="@Model.PostId"
+                                       class="btn btn-outline-danger">
+                                        <i class="fas fa-trash me-1"></i>Eliminar
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i> No hay comentarios aún. Sé el primero en comentar.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@functions {
+    public static string GetYouTubeId(string url)
+    {
+        var uri = new Uri(url);
+        var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+        return query.AllKeys.Contains("v") ? query["v"] : uri.Segments.Last();
+    }
+}

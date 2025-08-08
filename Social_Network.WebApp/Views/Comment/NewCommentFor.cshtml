@@ -1,0 +1,73 @@
+﻿@model Social_Network.Core.Application.ViewModels.Comments.CommentWritteVM
+@{
+    ViewData["Title"] = Model.IsCreating ?
+        (Model.ParentCommentId == null ? "Nuevo Comentario" : "Responder Comentario") :
+        "Editar Comentario";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-comment me-2"></i>
+                        @if (Model.IsCreating)
+                        {
+                            @(Model.ParentCommentId == null ? "Comentando" : "Respondiendo")
+                        }
+                        else
+                        {
+                            @("Editando comentario")
+                        }
+                    </h4>
+                </div>
+
+                <div class="card-body">
+                    <form asp-action="NewCommentFor" method="post">
+                        <input type="hidden" asp-for="PostId" />
+                        <input type="hidden" asp-for="ParentCommentId" />
+                        <input type="hidden" asp-for="CommentId" />
+                        <input type="hidden" asp-for="IsCreating" />
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Content" class="form-label">
+                                @if (Model.IsCreating)
+                                {
+                                    @(Model.ParentCommentId == null ? "Escribe tu comentario" : "Escribe tu respuesta")
+                                }
+                                else
+                                {
+                                    @("Edita tu comentario")
+                                }
+                            </label>
+                            <textarea asp-for="Content" class="form-control" rows="5"></textarea>
+                            <span asp-validation-for="Content" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-controller="Comment"
+                               asp-action="ShowCommentsOf"
+                               asp-route-id="@Model.PostId"
+                               class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Cancelar
+                            </a>
+
+                            <button type="submit" class="btn btn-primary">
+                                @if (Model.IsCreating)
+                                {
+                                    @(Model.ParentCommentId == null ? "Publicar comentario" : "Publicar respuesta")
+                                }
+                                else
+                                {
+                                    @("Guardar cambios")
+                                }
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

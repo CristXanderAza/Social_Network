@@ -1,0 +1,124 @@
+﻿@model Social_Network.Core.Application.ViewModels.Friendships.FriendshipMainVM
+@{
+    ViewData["Title"] = "Amigos";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            @foreach (var post in Model.Posts.OrderByDescending(p => p.LastUpdated))
+            {
+                <div class="card mb-4 shadow">
+                    <div class="card-header bg-white">
+                        <div class="d-flex align-items-center">
+                            <img src="@post.UserProfilePhotoPath" class="rounded-circle me-3" width="40" height="40" alt="Foto de perfil">
+                            <div>
+                                <h6 class="mb-0">@post.AuthorUserName</h6>
+                                <small class="text-muted">@post.LastUpdated?.ToString("g")</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <p class="card-text">@post.Content</p>
+
+                        @if (!string.IsNullOrEmpty(post.ImageUrl))
+                        {
+                            <div class="text-center my-3">
+                                <img src="~/@post.ImageUrl" class="img-fluid rounded" alt="Imagen de publicación">
+                            </div>
+                        }
+                        else if (!string.IsNullOrEmpty(post.VideoUrl))
+                        {
+                            <div class="ratio ratio-16x9 my-3">
+                                <iframe src="https://www.youtube.com/embed/@GetYouTubeId(post.VideoUrl)"
+                                        frameborder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowfullscreen></iframe>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="card-footer bg-white">
+                        <div class="d-flex justify-content-between">
+                            <form asp-controller="Home" asp-action="GiveLikeToPost" method="post">
+                                <input type="hidden" name="postId" value="@post.Id" />
+                                <button type="submit" class="btn btn-sm @(post.IsLiked ? "btn-success" : "btn-outline-success")">
+                                    <i class="fas fa-thumbs-up"></i> @post.Likes
+                                </button>
+                            </form>
+
+                            <form asp-controller="Home" asp-action="GiveDislikeToPost" method="post">
+                                <input type="hidden" name="postId" value="@post.Id" />
+                                <button type="submit" class="btn btn-sm @(post.IsDisliked ? "btn-danger" : "btn-outline-danger")">
+                                    <i class="fas fa-thumbs-down"></i> @post.Dislikes
+                                </button>
+                            </form>
+
+                            <a asp-controller="Comment" asp-action="ShowCommentsOf" asp-route-Id="@post.Id"
+                               class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-comment"></i> Comentar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow sticky-top" style="top: 20px;">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-users me-2"></i>Mis Amigos</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Friends.Any())
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var friend in Model.Friends)
+                            {
+                                <li class="list-group-item d-flex align-items-center">
+                                    <img src="@friend.ProfileImgURL" class="rounded-circle me-3" width="40" height="40" alt="Foto de perfil">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0">@friend.FriendName</h6>
+                                        <small class="text-muted">@friend.FirstName @friend.LastName</small>
+                                    </div>
+                                    <div class="btn-group">
+                                        <a asp-controller="Frienship"
+                                           asp-action="GetProfile"
+                                           asp-route-userId="@friend.FriendID"
+                                           class="btn btn-sm btn-outline-primary"
+                                           title="Ver perfil">
+                                            <i class="fas fa-user"></i>
+                                        </a>
+                                        <a asp-controller="Frienship"
+                                           asp-action="DeleteFriendship"
+                                           asp-route-friendShipId="@friend.FriendshipId"
+                                           class="btn btn-sm btn-outline-danger"
+                                           title="Eliminar amigo">
+                                            <i class="fas fa-user-times"></i>
+                                        </a>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info mb-0">
+                            <i class="fas fa-info-circle me-2"></i> No tienes amigos aún.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    public static string GetYouTubeId(string url)
+    {
+        var uri = new Uri(url);
+        var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+        return query.AllKeys.Contains("v") ? query["v"] : uri.Segments.Last();
+    }
+}

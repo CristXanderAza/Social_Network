@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.6">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Social_Network.Application\Social_Network.Core.Application.csproj" />
+    <ProjectReference Include="..\Social_Network.Identity\Social_Network.Infraestructure.Identity.csproj" />
+    <ProjectReference Include="..\Social_Network.Persistence\Social_Network.Infraestructure.Persistence.csproj" />
+    <ProjectReference Include="..\Social_Network.Shared\Social_Network.Infraestructure.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\Battleship\Attacks\" />
+    <Folder Include="Controllers\Battleship\ShipPositions\" />
+    <Folder Include="Controllers\Battleship\Ships\" />
+    <Folder Include="Controllers\Posts\" />
+  </ItemGroup>
+
+</Project>
